@@ -1,0 +1,67 @@
+<div id="kiri">
+	<?php
+		echo kategori($kategori_id);
+	?>
+</div>
+
+
+<div id="kanan">
+
+	<div id="slides">
+		<?php
+		$queryBanner = mysqli_query($koneksi, "SELECT * FROM banner WHERE status='on' ORDER BY banner_id DESC LIMIT 3");
+
+		while ($rowBanner = mysqli_fetch_array($queryBanner)) {
+
+			echo "<a href='".BASE_URL."$rowBanner[link]'><img src='".BASE_URL."images/slide/$rowBanner[gambar]' /></a>";
+		}
+		?>
+	</div>
+
+	<div id="frame-barang">
+		<ul>
+			<?php
+			if($kategori_id){
+
+				$kategori_id = "AND barang.kategori_id='$kategori_id'";		
+			}
+			
+			$query = mysqli_query($koneksi, "SELECT barang.*, kategori.kategori FROM barang JOIN kategori ON barang.kategori_id=kategori.kategori_id WHERE barang.status='on' $kategori_id ORDER BY rand() DESC LIMIT 100");
+			
+			$no = 1;
+			while ($row = mysqli_fetch_array($query)) {
+
+				$kategori = strtolower($row["kategori"]);
+				$barang = strtolower($row["nama_barang"]);
+				$barang = str_replace(" ", "-", $barang);
+
+				$style = false;
+				if($no == 3){
+					$style = "style='margin-right:0px;'";
+					$no = 0;
+				}
+			 
+			 	echo "<li $style>";
+			 	echo "<p class='price'>".rupiah($row['harga'])."</p>";
+			 	echo "<a href='".BASE_URL."$row[barang_id]/$kategori/$barang.html'>";
+			 	echo "<img src='".BASE_URL."images/barang/$row[gambar]' />";
+			 	echo "</a>";
+
+			 	echo "<div class='keterangan-gambar'>";
+			 	echo "<p><a href='".BASE_URL."$row[barang_id]/$kategori/$barang.html'>$row[nama_barang]</p>";
+			 	echo "<span>Stok : $row[stok]</span>";
+			 	echo "</a>";
+			 	echo "<div>";
+
+			 	echo "<div class='button-add-cart'>";
+			 	echo "<a href='".BASE_URL."tambah_keranjang.php?barang_id=$row[barang_id]'>+ Add To Cart </a>";
+			 	echo "</div>";
+
+			 $no++;
+				
+			}
+
+			?>
+		</ul>
+	</div>
+</div>
